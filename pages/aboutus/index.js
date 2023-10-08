@@ -1,9 +1,9 @@
-// for route -> /news
+// for route -> /aboutus
 
 const NewsPage = (props) => {
   return (
     <>
-      <h1>The News Page</h1>
+      <h1>The About Us Page</h1>
     </>
   );
 };
