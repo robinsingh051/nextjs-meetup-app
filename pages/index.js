@@ -39,7 +39,7 @@ export async function getStaticProps() {
     props: {
       meetups: updatedMeetups,
     },
-    // revalidate:10  //next js will check for updated data in every 10 seconds
+    revalidate: 1, //next js will check for updated data in every 10 seconds
   };
 }
 
