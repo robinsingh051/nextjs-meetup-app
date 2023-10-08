@@ -27,7 +27,30 @@ const DUMMY_MEETUPS = [
   },
 ];
 const HomePage = (props) => {
-  return <MeetupList meetups={DUMMY_MEETUPS} />;
+  return <MeetupList meetups={props.meetups} />;
 };
+
+export async function getStaticProps() {
+  //for prerendering, it will run during the build process
+  //fetch data from API
+  return {
+    props: {
+      meetups: DUMMY_MEETUPS,
+    },
+    // revalidate:10  //next js will check for updated data in every 10 seconds
+  };
+}
+
+// export async function getServerSideProps(context) {
+//   //for prerendering, it will run for every request in the server
+//   //fetch data from API
+//   //   const req = context.req;
+//   //   const res = context.res;
+//   return {
+//     props: {
+//       meetups: DUMMY_MEETUPS,
+//     },
+//   };
+// }
 
 export default HomePage;
