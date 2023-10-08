@@ -1,38 +1,31 @@
 import MeetupDetails from "@/components/meetups/MeetupDetails";
+import { MongoClient, ObjectId } from "mongodb";
 const MeetupDetail = (props) => {
   return (
     <MeetupDetails
-      image={
-        "https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Gopuram_Corner_View_of_Thanjavur_Brihadeeswara_Temple..JPG/800px-Gopuram_Corner_View_of_Thanjavur_Brihadeeswara_Temple..JPG"
-      }
-      title={"a first meet up"}
-      address={"Some Street 5, Some City"}
-      description={"The Meetup description"}
+      image={props.meetupData.image}
+      title={props.meetupData.title}
+      address={props.meetupData.address}
+      description={props.meetupData.description}
     />
   );
 };
 
 //next js will generate all pages for all meetupIds
 export async function getStaticPaths() {
+  const client = await MongoClient.connect(process.env.URL);
+  const db = client.db();
+  const meetupsCollection = db.collection("meetups");
+  const meetUps = await meetupsCollection.find({}, { _id: 1 }).toArray();
+  client.close();
+  const paths = meetUps.map((meetUp) => ({
+    params: {
+      meetupId: meetUp._id.toString(),
+    },
+  }));
   return {
     fallback: false, //if false means we will get 404 for other ids which are not defined and if it is true the next js will try to generate the page for that id on fly
-    paths: [
-      {
-        params: {
-          meetupId: "m1",
-        },
-      },
-      {
-        params: {
-          meetupId: "m2",
-        },
-      },
-      {
-        params: {
-          meetupId: "m3",
-        },
-      },
-    ],
+    paths: paths,
   };
 }
 
@@ -40,15 +33,22 @@ export async function getStaticProps(context) {
   //for prerendering, it will run during the build process
   //fetch data from API
   const meetupId = context.params.meetupId;
+  const client = await MongoClient.connect(process.env.URL);
+  const db = client.db();
+  const meetupsCollection = db.collection("meetups");
+  const selectedMeetUp = await meetupsCollection.findOne({
+    _id: new ObjectId(meetupId),
+  });
+  client.close();
+
   return {
     props: {
       meetupData: {
-        id: "m1",
-        title: "A First Meetup",
-        image:
-          "https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Gopuram_Corner_View_of_Thanjavur_Brihadeeswara_Temple..JPG/800px-Gopuram_Corner_View_of_Thanjavur_Brihadeeswara_Temple..JPG",
-        address: "Brihadeeswara Temple",
-        description: "This is a first meetup!",
+        id: selectedMeetUp._id.toString(),
+        title: selectedMeetUp.title,
+        address: selectedMeetUp.address,
+        image: selectedMeetUp.image,
+        description: selectedMeetUp.description,
       },
     },
     // revalidate:10  //next js will check for updated data in every 10 seconds
