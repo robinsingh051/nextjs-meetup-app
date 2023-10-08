@@ -31,7 +31,7 @@ export async function getStaticPaths() {
     },
   }));
   return {
-    fallback: true, //if false means we will get 404 for other ids which are not defined and if it is true the next js will try to generate the page for that id on fly
+    fallback: "blocking", //if false means we will get 404 for other ids which are not defined and if it is true the next js will try to generate the page for that id on fly
     paths: paths,
   };
 }
